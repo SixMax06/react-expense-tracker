@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../App.css'
 
-const Expense = ({att_ID, att_title, att_description, att_price, att_category}) => {
+const Expense = ( {att_ID, att_title, att_description, att_price, att_category} ) => {
     const [ID, setID] = useState(att_ID)
     const [title, setTitle] = useState(att_title)
     const [description, setDescription] = useState(att_description)
