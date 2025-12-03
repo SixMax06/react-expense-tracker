@@ -13,7 +13,7 @@ const makeGET_expenses = async () => {
 const makeGET_categories = async () => {
   const db = new PocketBase('http://127.0.0.1:8090')
   let records = await db.collection('expenses_categories').getFullList()
-  return records.map(record => [record.id, record.name])
+  return records.map(record => ({ id: record.id, name: record.name }))
 }
 
 const makePOST = async (event, title, description, price, category) => {
@@ -50,43 +50,40 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       const records = await makeGET_expenses()
-      console.log('Fetched expenses with categories:', records)
       setData(records)
     }
     fetchData()
   }, [categoryList])
 
   const findCategoryName = (categoryID) => {
-    for (let i = 0; i < categoryList.length; i++) {
-      if (categoryList[i][0] === categoryID) {
-        console.log('Found category name:', categoryList[i][1])
-        return categoryList[i][1]
-      }
-    }
+    for (let i = 0; i < categoryList.length; i++)
+      if (categoryList[i].id === categoryID)
+        return categoryList[i].name
+      
     return 'Unknown'
   }
 
   const findCategoryID = (categoryName) => {
-    for (let i = 0; i < categoryList.length; i++) {
-      if (categoryList[i][1] === categoryName) {
-        return categoryList[i][0]
-      }
-    }
-    return null
+    for (let i = 0; i < categoryList.length; i++)
+      if (categoryList[i].name == categoryName)
+        return categoryList[i].id
+
+    return 'null'
   }
 
-  const handleSubmit = async (event) => {
-    await makePOST(event, title, description, price, category)
+  const handleSubmit = async(event) => {
+    await makePOST(event, title, description, price, findCategoryID(category))
 
     setTitle('')
     setDescription('')
     setPrice('')
     setCategory('')
 
-    location.reload()
+    const records = await makeGET_expenses()
+    setData(records)
   }
 
-  const handeModify = () => { console.log('Modifica') }
+  const handleModify = () => { console.log('Modifica') }
 
   const handleDelete = () => { console.log('Elimina') }
 
@@ -97,7 +94,7 @@ const App = () => {
           <input type="text" placeholder="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
           <input type="text" placeholder="Description" value={description} onChange={(event) => setDescription(event.target.value)} />
           <input type="number" placeholder="Price" value={price} onChange={(event) => setPrice(event.target.value)} />
-          <input type="text" placeholder="Category" value={category} onChange={(event) => setCategory(findCategoryID(category))} />
+          <input type="text" placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
           <button type="submit">Add Expense</button>
         </form>
       </div>
@@ -113,8 +110,8 @@ const App = () => {
               att_price={element.price}
               att_category={findCategoryName(element.category)}
             />
-            <button onClick={handeModify} key={element.id + '_modifica'}>Modifica</button>
-            <button onClick={handleDelete} key={element.id + '_elimina'}>Elimina</button>
+            <button key={element.id + '_modifybtn'} onClick={handleModify}>Modify</button>
+            <button key={element.id + '_deletebtn'} onClick={handleDelete}>Delete</button>
           </>)
         })}
       </div>
