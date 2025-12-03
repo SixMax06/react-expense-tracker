@@ -4,19 +4,19 @@ import './App.css'
 import Graph from './react-components/Graph'
 import Expense from './react-components/Expense.jsx'
 
-const makeGET_expenses = async() => {
+const makeGET_expenses = async () => {
   const db = new PocketBase('http://127.0.0.1:8090')
   let records = await db.collection('expenses').getFullList()
   return records.map(record => ({ id: record.id, title: record.title, description: record.description, price: record.price, category: record.category }))
 }
 
-const makeGET_categories = async() => {
+const makeGET_categories = async () => {
   const db = new PocketBase('http://127.0.0.1:8090')
   let records = await db.collection('expenses_categories').getFullList()
-  return records.map(record => [ record.id, record.name ])
+  return records.map(record => [record.id, record.name])
 }
 
-const makePOST = async(event, title, description, price, category) => {
+const makePOST = async (event, title, description, price, category) => {
   event.preventDefault()
   const db = new PocketBase('http://127.0.0.1:8090')
   console.log('Connected to PocketBase')
@@ -40,32 +40,21 @@ const App = () => {
   const [category, setCategory] = useState('')
 
   useEffect(() => {
-    const fetchData = async() => {
-      const records = await makeGET_expenses()
-      setData(records)
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchCategories = async() => {
+    const fetchCategories = async () => {
       const categories = await makeGET_categories()
       setCategoryList(categories)
     }
     fetchCategories()
   }, [])
 
-  const handleSubmit = async(event) => {
-    await makePOST(event, title, description, price, category)
-
-    setTitle('')
-    setDescription('')
-    setPrice('')
-    setCategory('')
-
-    const records = await makeGET_expenses()
-    setData(records)
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const records = await makeGET_expenses()
+      console.log('Fetched expenses with categories:', records)
+      setData(records)
+    }
+    fetchData()
+  }, [categoryList])
 
   const findCategoryName = (categoryID) => {
     for (let i = 0; i < categoryList.length; i++) {
@@ -77,6 +66,30 @@ const App = () => {
     return 'Unknown'
   }
 
+  const findCategoryID = (categoryName) => {
+    for (let i = 0; i < categoryList.length; i++) {
+      if (categoryList[i][1] === categoryName) {
+        return categoryList[i][0]
+      }
+    }
+    return null
+  }
+
+  const handleSubmit = async (event) => {
+    await makePOST(event, title, description, price, category)
+
+    setTitle('')
+    setDescription('')
+    setPrice('')
+    setCategory('')
+
+    location.reload()
+  }
+
+  const handeModify = () => { console.log('Modifica') }
+
+  const handleDelete = () => { console.log('Elimina') }
+
   return (
     <>
       <div className="add-expense">
@@ -84,21 +97,25 @@ const App = () => {
           <input type="text" placeholder="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
           <input type="text" placeholder="Description" value={description} onChange={(event) => setDescription(event.target.value)} />
           <input type="number" placeholder="Price" value={price} onChange={(event) => setPrice(event.target.value)} />
-          <input type="text" placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
+          <input type="text" placeholder="Category" value={category} onChange={(event) => setCategory(findCategoryID(category))} />
           <button type="submit">Add Expense</button>
         </form>
       </div>
 
       <div className="expenses-list">
         {data.map(element => {
-          return (<Expense 
-            key={element.id}
-            att_ID={element.id} 
-            att_title={element.title} 
-            att_description={element.description} 
-            att_price={element.price} 
-            att_category={findCategoryName(element.category)} 
-          />)
+          return (<>
+            <Expense
+              key={element.id}
+              att_ID={element.id}
+              att_title={element.title}
+              att_description={element.description}
+              att_price={element.price}
+              att_category={findCategoryName(element.category)}
+            />
+            <button onClick={handeModify} key={element.id + '_modifica'}>Modifica</button>
+            <button onClick={handleDelete} key={element.id + '_elimina'}>Elimina</button>
+          </>)
         })}
       </div>
     </>
