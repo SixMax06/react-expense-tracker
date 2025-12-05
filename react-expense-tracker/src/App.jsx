@@ -16,19 +16,19 @@ const makeGET_categories = async () => {
   return records.map(record => ({ id: record.id, name: record.name }))
 }
 
-const makePOST = async (event, title, description, price, category) => {
+const makePOST = async(event, title, description, price, category, ID='') => {
   event.preventDefault()
   const db = new PocketBase('http://127.0.0.1:8090')
-  console.log('Connected to PocketBase')
+
   let newExpense = {
     "title": title,
     "description": description,
     "price": price,
     "category": category
   }
-  console.log('Posting expense')
-  await db.collection('expenses').create(newExpense)
-  console.log('Created record')
+
+  if (ID === "") await db.collection('expenses').create(newExpense)
+  else await db.collection('expenses').update(ID, newExpense)
 }
 
 const App = () => {
@@ -68,34 +68,50 @@ const App = () => {
       if (categoryList[i].name == categoryName)
         return categoryList[i].id
 
-    return 'null'
+    return '-1'
   }
 
-  const handleSubmit = async(event) => {
-    await makePOST(event, title, description, price, findCategoryID(category))
+  const handleSubmit = (event) => {
+    makePOST(event, title, description, price, findCategoryID(category))
+    .then(() => {const records = makeGET_expenses(); return records})
+    .then((records) => {setData(records)} )
 
     setTitle('')
     setDescription('')
     setPrice('')
     setCategory('')
-
-    const records = await makeGET_expenses()
-    setData(records)
   }
 
-  const handleModify = () => { console.log('Modifica') }
+  const handleModify = (event) => { 
+    makePOST(event, title, description, price, findCategoryID(category), event.target.id)
+    .then(() => {const records = makeGET_expenses(); return records})
+    .then((records) => {setData(records)} )
 
-  const handleDelete = () => { console.log('Elimina') }
+    setTitle('')
+    setDescription('')
+    setPrice('')
+    setCategory('')
+  }
+
+  const handleDelete = (event) => { 
+    const IDExpense = event.target.id
+    const db = new PocketBase('http://127.0.0.1:8090')
+    db.collection('expenses').delete(IDExpense)
+    .then(() => {const records = makeGET_expenses(); return records})
+    .then((records) => {setData(records)} )
+  }
 
   return (
     <>
       <div className="add-expense">
         <form className="add-bar" onSubmit={handleSubmit}>
-          <input type="text" placeholder="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
-          <input type="text" placeholder="Description" value={description} onChange={(event) => setDescription(event.target.value)} />
-          <input type="number" placeholder="Price" value={price} onChange={(event) => setPrice(event.target.value)} />
-          <input type="text" placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
-          <button type="submit">Add Expense</button>
+          <div id="inputs-div">
+            <input type="text" className="input" placeholder="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
+            <input type="text" className="input" placeholder="Description" value={description} onChange={(event) => setDescription(event.target.value)} /> <br />
+            <input type="number" className="input" placeholder="Price" value={price} onChange={(event) => setPrice(event.target.value)} />
+            <input type="text" className="input" placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
+          </div>
+          <button type="submit" id="form-submit" className="btn">Add Expense</button>
         </form>
       </div>
 
@@ -110,8 +126,8 @@ const App = () => {
               att_price={element.price}
               att_category={findCategoryName(element.category)}
             />
-            <button key={element.id + '_modifybtn'} onClick={handleModify}>Modify</button>
-            <button key={element.id + '_deletebtn'} onClick={handleDelete}>Delete</button>
+            <button key={element.id + '_modifybtn'} id={element.id} className="btn" onClick={handleModify}>Modify</button>
+            <button key={element.id + '_deletebtn'} id={element.id} className="btn" onClick={handleDelete}>Delete</button>
           </>)
         })}
       </div>
