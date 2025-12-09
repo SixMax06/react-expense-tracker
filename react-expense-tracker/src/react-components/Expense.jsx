@@ -9,7 +9,7 @@ const Expense = ({ att_ID, att_title, att_description, att_price, att_category }
                 <h2 className="card-title text-2xl font-bold text-gray-800">
                     {att_title}
                 </h2>
-                <p className="text-gray-600 mb-4">{att_description}</p>
+                <h3 className="text-gray-600 mb-4">{att_description}</h3>
                 <div className="flex items-center justify-between mt-auto">
                     <div className="flex flex-col">
                         <span className="text-3xl font-bold text-emerald-600">

@@ -37,7 +37,7 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     width: 100%;
-    max-width: 1600px;
+    max-width: auto;
     margin: 0 auto;
     padding: 2rem;
 }

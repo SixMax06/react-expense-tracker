@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import PocketBase from 'pocketbase'
 import './App.css'
 import Graph from './react-components/Graph'
@@ -16,7 +16,7 @@ const makeGET_categories = async () => {
   return records.map(record => ({ id: record.id, name: record.name }))
 }
 
-const makePOST = async (event, title, description, price, category, ID = '') => {
+const makePOST_create = async (event, title, description, price, category) => {
   event.preventDefault()
   const db = new PocketBase('http://127.0.0.1:8090')
 
@@ -27,8 +27,21 @@ const makePOST = async (event, title, description, price, category, ID = '') => 
     "category": category
   }
 
-  if (ID === "") await db.collection('expenses').create(newExpense)
-  else await db.collection('expenses').update(ID, newExpense)
+  await db.collection('expenses').create(newExpense)
+}
+
+const makePOST_update = async (event, title, description, price, category, ID) => {
+  event.preventDefault()
+  const db = new PocketBase('http://127.0.0.1:8090')
+
+  let newExpense = {
+    "title": title,
+    "description": description,
+    "price": price,
+    "category": category
+  }
+
+  await db.collection('expenses').update(ID, newExpense)
 }
 
 const App = () => {
@@ -56,11 +69,27 @@ const App = () => {
     fetchData()
   }, [categoryList])
 
+  const findCategoryName = useCallback((categoryID) => {
+    for (let i = 0; i < categoryList.length; i++)
+      if (categoryList[i].id === categoryID)
+        return categoryList[i].name
+
+    return 'Unknown'
+  }, [categoryList])
+
+  const findCategoryID = useCallback((categoryName) => {
+    for (let i = 0; i < categoryList.length; i++)
+      if (categoryList[i].name == categoryName)
+        return categoryList[i].id
+
+    return '-1'
+  }, [categoryList])
+
   useEffect(() => {
     const getTotals = () => {
       let totals = {}
       for (let i = 0; i < data.length; i++) {
-        const catID = data[i].category
+        const catID = findCategoryName(data[i].category)
         const price = parseFloat(data[i].price)
         if (totals[catID]) totals[catID] += price
         else totals[catID] = price
@@ -68,26 +97,10 @@ const App = () => {
       setTotalList(totals)
     }
     getTotals()
-  }, [data])
-
-  const findCategoryName = (categoryID) => {
-    for (let i = 0; i < categoryList.length; i++)
-      if (categoryList[i].id === categoryID)
-        return categoryList[i].name
-
-    return 'Unknown'
-  }
-
-  const findCategoryID = (categoryName) => {
-    for (let i = 0; i < categoryList.length; i++)
-      if (categoryList[i].name == categoryName)
-        return categoryList[i].id
-
-    return '-1'
-  }
+  }, [data, findCategoryName])
 
   const handleSubmit = (event) => {
-    makePOST(event, title, description, price, findCategoryID(category))
+    makePOST_create(event, title, description, price, findCategoryID(category))
       .then(() => { const records = makeGET_expenses(); return records })
       .then((records) => { setData(records) })
 
@@ -98,7 +111,7 @@ const App = () => {
   }
 
   const handleModify = (event) => {
-    makePOST(event, title, description, price, findCategoryID(category), event.target.id)
+    makePOST_update(event, title, description, price, findCategoryID(category), event.target.id)
       .then(() => { const records = makeGET_expenses(); return records })
       .then((records) => { setData(records) })
 
@@ -124,9 +137,10 @@ const App = () => {
           <form className="add-bar" onSubmit={handleSubmit}>
             <div id="inputs-div">
               <input type="text" className="input" placeholder="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
-              <input type="text" className="input" placeholder="Description" value={description} onChange={(event) => setDescription(event.target.value)} /> <br />
+              <input type="text" className="input" placeholder="Description" value={description} onChange={(event) => setDescription(event.target.value)} />
               <input type="number" className="input" placeholder="Price" value={price} onChange={(event) => setPrice(event.target.value)} />
               <input type="text" className="input" placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
+
             </div>
             <button type="submit" id="form-submit" className="btn">Add Expense</button>
           </form>
@@ -181,11 +195,17 @@ const App = () => {
       {/* Right column - Empty/Sidebar */}
       <div className="sidebar-column">
         <div className="sidebar-placeholder">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <h3>Analytics Dashboard</h3>
-          <p>Your expense statistics and charts will appear here. Add some expenses to see insights!</p>
+          {data.length === 0 ? (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <h3>Analytics Dashboard</h3>
+              <p>Your expense statistics and charts will appear here. Add some expenses to see insights!</p>
+            </>
+          ) : (
+            <Graph {...totalList} />
+          )}
         </div>
       </div>
     </div>
