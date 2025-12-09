@@ -1,3 +1,434 @@
-.btn, input {
-    margin: 10px;
+/* Main container */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  height: 100vh;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Content column (left) */
+.content-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Add Expense Form */
+.add-expense {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.add-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+#inputs-div {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#inputs-div br {
+  display: none;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+#form-submit {
+  width: 100%;
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+}
+
+#form-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* Expenses Grid Layout */
+.expenses-list {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  padding-right: 0.5rem;
+  align-content: start;
+}
+
+.expense-item {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.expense-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--category-color, #4f46e5), #22d3ee);
+}
+
+.expense-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Expense card content */
+.expense-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+.expense-card h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.expense-card h3 {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #6b7280;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.expense-card p {
+  font-size: 0.875rem;
+  margin: 0.25rem 0;
+  color: #4b5563;
+}
+
+.expense-card p:first-of-type {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+  margin: 0.75rem 0;
+}
+
+.expense-card p:last-of-type {
+  font-size: 0.8rem;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 0.5rem;
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Category-specific colors */
+.expense-item[data-category*="Food"]::before {
+  --category-color: #f59e0b;
+}
+
+.expense-item[data-category*="Transport"]::before {
+  --category-color: #3b82f6;
+}
+
+.expense-item[data-category*="Shopping"]::before {
+  --category-color: #ec4899;
+}
+
+.expense-item[data-category*="Entertainment"]::before {
+  --category-color: #8b5cf6;
+}
+
+.expense-item[data-category*="Bills"]::before {
+  --category-color: #ef4444;
+}
+
+.expense-item[data-category*="Other"]::before {
+  --category-color: #6b7280;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.btn:nth-of-type(1) {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  color: white;
+}
+
+.btn:nth-of-type(2) {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Sidebar column (right) */
+.sidebar-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.sidebar-placeholder {
+  text-align: center;
+  color: #6b7280;
+}
+
+.sidebar-placeholder h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #4b5563;
+}
+
+.sidebar-placeholder p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 300px;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 1536px) {
+  .expenses-list {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 1280px) {
+  .expenses-list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .content-column,
+  .sidebar-column {
+    height: auto;
+    min-height: 50vh;
+  }
+  
+  .expenses-list {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  
+  .sidebar-placeholder h3 {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .content-column {
+    padding: 1rem;
+  }
+  
+  .add-expense {
+    padding: 1.25rem;
+  }
+  
+  #inputs-div {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .expenses-list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .expense-item {
+    padding: 1.25rem;
+  }
+  
+  .input {
+    padding: 0.625rem 0.875rem;
+  }
+  
+  .expense-card h2 {
+    font-size: 1.125rem;
+  }
+  
+  .expense-card p:first-of-type {
+    font-size: 1.25rem;
+  }
+  
+  .action-buttons {
+    gap: 0.5rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.75rem;
+  }
+  
+  .content-column,
+  .sidebar-column {
+    padding: 1rem;
+  }
+  
+  .expense-item {
+    padding: 1rem;
+  }
+  
+  .expenses-list {
+    gap: 0.75rem;
+  }
+}
+
+/* Empty state for expenses */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Empty grid item animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.expense-item:empty {
+  animation: pulse 2s ease-in-out infinite;
 }

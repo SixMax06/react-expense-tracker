@@ -1,19 +1,24 @@
 import { useState } from 'react'
 import '../App.css'
 
-const Expense = ( {att_ID, att_title, att_description, att_price, att_category} ) => {
+const Expense = ({ att_ID, att_title, att_description, att_price, att_category }) => {
     const [ID, _] = useState(att_ID)
-    // const [title, setTitle] = useState(att_title)
-    // const [description, setDescription] = useState(att_description)
-    // const [price, setPrice] = useState(att_price)
-    // const [category, setCategory] = useState(att_category)
-    
     return (
-        <div className="expense-card">
-            <h2>{att_title}</h2>
-            <h3>{att_description}</h3>
-            <p>Price: ${att_price}</p>
-            <p>Category: {att_category}</p>
+        <div className="expense-card card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div className="card-body">
+                <h2 className="card-title text-2xl font-bold text-gray-800">
+                    {att_title}
+                </h2>
+                <p className="text-gray-600 mb-4">{att_description}</p>
+                <div className="flex items-center justify-between mt-auto">
+                    <div className="flex flex-col">
+                        <span className="text-3xl font-bold text-emerald-600">
+                            ${att_price}
+                        </span>
+                        <span className="badge badge-outline badge-primary">{att_category}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
