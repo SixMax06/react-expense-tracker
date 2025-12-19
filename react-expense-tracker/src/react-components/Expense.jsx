@@ -3,6 +3,8 @@ import '../App.css'
 
 const Expense = ({ att_ID, att_title, att_description, att_price, att_category }) => {
     const [ID, _] = useState(att_ID)
+
+    //Da qui in poi le classi dei tag sono state generate da Deepseek
     return (
         <div className="expense-card card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
             <div className="card-body">

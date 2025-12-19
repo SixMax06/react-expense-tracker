@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* File generato interamente da Deepseek con qualche piccolo aggiustamento fatto da me */
+
 /* DaisyUI theme customization */
 :root {
     --daisyui-primary: #4f46e5;

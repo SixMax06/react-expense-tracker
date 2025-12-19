@@ -1,8 +1,10 @@
-import { use, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import PocketBase from 'pocketbase'
 import './App.css'
 import Graph from './react-components/Graph'
 import Expense from './react-components/Expense.jsx'
+
+//La logica del programma è stata scritta interamente da me con qualche aiuto da AI per la risoluzione di bug
 
 const makeGET_expenses = async () => {
   const db = new PocketBase('http://127.0.0.1:8090')
@@ -129,6 +131,8 @@ const App = () => {
       .then((records) => { setData(records) })
   }
 
+
+  //Da qui in poi le classi dei tag sono state scritte da Deepseek
   return (
     <div className="app-container">
       {/* Left column - Content */}
